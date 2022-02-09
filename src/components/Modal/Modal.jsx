@@ -1,35 +1,36 @@
 import PropTypes from 'prop-types';
-import { Component } from 'react/cjs/react.production.min';
+import { useEffect } from 'react';
 import s from '../Modal/Modal.module.css';
 
-class Modal extends Component {
-  componentDidMount() {
-    window.addEventListener('keydown', this.onKeyDown);
-  }
-  componentWillUnmount() {
-    window.removeEventListener('keydown', this.onKeyDown);
-  }
-  onKeyDown = e => {
+const Modal = ({ toggleModal, largeImageURL }) => {
+  useEffect(() => {
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, []);
+  const onKeyDown = e => {
     if (e.code === 'Escape') {
-      this.props.toggleModal();
+      toggleModal();
     }
   };
-  onOverlayClick = e => {
+
+  const onOverlayClick = e => {
     if (e.currentTarget === e.target) {
-      this.props.toggleModal();
+      toggleModal();
     }
   };
-  render() {
-    return (
-      <div className={s.overlay} onClick={this.onOverlayClick}>
-        <div className={s.modal}>
-          <img src={this.props.largeImageURL} alt="" />
-        </div>
+
+  return (
+    <div className={s.overlay} onClick={onOverlayClick}>
+      <div className={s.modal}>
+        <img src={largeImageURL} alt="" />
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 Modal.propTypes = {
   largeImageURL: PropTypes.string.isRequired,
+  toggleModal: PropTypes.func.isRequired,
 };
 export default Modal;
