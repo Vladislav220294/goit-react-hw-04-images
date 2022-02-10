@@ -6,7 +6,7 @@ const Modal = ({ toggleModal, largeImageURL }) => {
   
   useEffect(() => {
     const onKeyDown = e => {
-    if (e.code === 'Space') {
+    if (e.code === 'Escape') {
       toggleModal();
     }
   };

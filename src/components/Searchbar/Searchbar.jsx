@@ -1,13 +1,12 @@
 import PropTypes from 'prop-types';
 import { useState } from 'react';
-
 import s from '../Searchbar/Searchbar.module.css';
 
 const Searchbar = ({SubmitForm}) => {
   const [inputalue, setInputalue] = useState('');
   
 const  onInputValue = e => {
-  const inputalue = e.currentTarget.value.toLowerCase().trim();
+  const inputalue = e.currentTarget.value.toLowerCase();
     setInputalue(inputalue)
     
   };

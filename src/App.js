@@ -1,4 +1,4 @@
-import { Component } from 'react/cjs/react.production.min';
+import { useEffect, useState } from 'react';
 import './App.css';
 import Searchbar from './components/Searchbar/Searchbar.jsx';
 import ImageGalleryList from './components/ImageGalleryList/ImageGalleryList.jsx';
@@ -7,109 +7,100 @@ import Button from './components/Button/Button.jsx';
 import Modal from './components/Modal/Modal.jsx';
 import Fetch from './components/Fetch/Fetch';
 
-class App extends Component {
-  state = {
-    images: [],
-    inputalue: '',
-    page: 1,
-    showModal: false,
-    largeImageURL: '',
-    error: null,
-    isLoading: false,
-  };
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    if (
-      this.state.inputalue !== prevState.inputalue ||
-      prevState.page !== this.state.page
-    ) {
-      this.setState(prevState => ({ isLoading: !prevState.isLoading }));
+const App = () => {
+  const [images, setImages] = useState([]);
+  const [inputalue, setInputalue] = useState('indonesia');
+  const [page, setPage] = useState(1);
+  const [showModal, setShowModal] = useState(false);
+  const [largeImageURL, setLargeImageURL] = useState('');
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-      Fetch(this.state.inputalue, this.state.page)
-        .then(images => {
-          if (images.length === 0) {
-            throw new Error('some error');
-          }
-          this.setState(prevState => ({
-            isLoading: !prevState.isLoading,
-            images: [...prevState.images, ...images],
-          }));
-        })
+  useEffect(() => {
+    setIsLoading(true);
+    Fetch(inputalue, page)
+      .then(images => {
+        if (images.length === 0) {
+          throw new Error('some error');
+        }
 
-        .catch(error => this.setState({ error }));
-    }
-    if (this.state.error !== prevState.error) {
-      this.state.error && alert('wrong name');
-      this.setState({ error: null, isLoading: false });
-    }
-    if (prevState.images !== this.state.images) {
-      window.scrollTo({
-        top: snapshot,
-        behavior: 'smooth',
-      });
-    }
-  }
-  getSnapshotBeforeUpdate() {
-    return document.body.scrollHeight;
-  }
+        setImages(prev => [...prev, ...images]);
 
-  onLoadMore = () => {
-    if (this.state.images) {
-      this.setState(prevState => ({ page: prevState.page + 1 }));
+        setIsLoading(false);
+      })
+      .catch(error => setError(error));
+  }, [inputalue, page]);
+
+  useEffect(() => {
+    error && alert('wrong name');
+    setIsLoading(false);
+  }, [error]);
+  //////////////////////////////////////Доработать скрол
+  // useEffect(() => {
+  //    window.scrollTo({
+  //       top: snapshot,
+  //       behavior: 'smooth',
+  //     });
+  // }, [images])
+  // getSnapshotBeforeUpdate() {
+  //   return document.body.scrollHeight;
+  // }
+  //////////////////////////////////////Доработать скрол
+  const onLoadMore = () => {
+    if (images) {
+      setPage(page => page + 1);
     }
   };
 
-  toggleModal = largeImageURL => {
-    this.setState(prevState => ({
-      showModal: !prevState.showModal,
-      largeImageURL,
-    }));
+  const toggleModal = largeImageURL => {
+    setShowModal(showModal => !showModal);
+    setLargeImageURL(largeImageURL);
   };
-  SubmitForm = inputalue => {
-    if (this.state.inputalue === inputalue) {
+  const SubmitForm = param => {
+    if (inputalue === param) {
       return;
     }
-    this.setState({ inputalue, page: 1, images: [] });
+    setError(null);
+    setInputalue(param);
+    setPage(1);
+    setImages([]);
   };
-  render() {
-    const { error, images, showModal, isLoading } = this.state;
 
-    return (
-      <div className="App">
-        <Searchbar SubmitForm={this.SubmitForm} />
-        <>
-          {error ? (
-            <>
-              <h1>Some issue has occured</h1>
-            </>
-          ) : (
-            <>
-              <ImageGalleryList
-                images={images}
-                showModal={showModal}
-                toggleModal={this.toggleModal}
+  return (
+    <div className="App">
+      <Searchbar SubmitForm={SubmitForm} />
+      <>
+        {error ? (
+          <>
+            <h1>Some issue has occured</h1>
+          </>
+        ) : (
+          <>
+            <ImageGalleryList
+              images={images}
+              showModal={showModal}
+              toggleModal={toggleModal}
+            />
+            {isLoading && (
+              <ThreeDots
+                heigth="100"
+                width="100"
+                color="blue"
+                ariaLabel="loading"
               />
-              {isLoading && (
-                <ThreeDots
-                  heigth="100"
-                  width="100"
-                  color="blue"
-                  ariaLabel="loading"
-                />
-              )}
-              {images.length > 0 && <Button onLoadMore={this.onLoadMore} />}
+            )}
+            {images.length > 0 && images.length % 12 === 0 && (
+              <Button onLoadMore={onLoadMore} />
+            )}
 
-              {showModal && (
-                <Modal
-                  largeImageURL={this.state.largeImageURL}
-                  toggleModal={this.toggleModal}
-                />
-              )}
-            </>
-          )}
-        </>
-      </div>
-    );
-  }
-}
+            {showModal && (
+              <Modal largeImageURL={largeImageURL} toggleModal={toggleModal} />
+            )}
+          </>
+        )}
+      </>
+    </div>
+  );
+};
 
 export default App;
