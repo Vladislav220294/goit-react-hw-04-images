@@ -3,17 +3,19 @@ import { useEffect } from 'react';
 import s from '../Modal/Modal.module.css';
 
 const Modal = ({ toggleModal, largeImageURL }) => {
+  
   useEffect(() => {
+    const onKeyDown = e => {
+    if (e.code === 'Space') {
+      toggleModal();
+    }
+  };
     window.addEventListener('keydown', onKeyDown);
     return () => {
       window.removeEventListener('keydown', onKeyDown);
     };
-  }, []);
-  const onKeyDown = e => {
-    if (e.code === 'Escape') {
-      toggleModal();
-    }
-  };
+  }, [toggleModal]);
+  
 
   const onOverlayClick = e => {
     if (e.currentTarget === e.target) {

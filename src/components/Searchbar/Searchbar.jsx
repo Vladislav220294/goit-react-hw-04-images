@@ -1,35 +1,37 @@
 import PropTypes from 'prop-types';
-import { Component } from 'react/cjs/react.production.min';
+import { useState } from 'react';
+
 import s from '../Searchbar/Searchbar.module.css';
 
-class Searchbar extends Component {
-  state = {
-    inputalue: '',
+const Searchbar = ({SubmitForm}) => {
+  const [inputalue, setInputalue] = useState('');
+  
+const  onInputValue = e => {
+  const inputalue = e.currentTarget.value.toLowerCase().trim();
+    setInputalue(inputalue)
+    
   };
-  onInputValue = e => {
-    this.setState({ inputalue: e.currentTarget.value.toLowerCase().trim() });
-  };
-  onImagesSubmit = e => {
-    const { SubmitForm } = this.props;
-    const { inputalue } = this.state;
+ const onImagesSubmit = e => {
+    
     e.preventDefault();
     if (inputalue.trim() === '') {
       return alert('wrong name');
     }
     SubmitForm(inputalue);
-    this.setState({ inputalue: '' });
+    setInputalue('')
+    
   };
-  render() {
+  
     return (
       <header className={s.searchbar}>
-        <form onSubmit={this.onImagesSubmit} className={s.searchForm}>
+        <form onSubmit={onImagesSubmit} className={s.searchForm}>
           <button type="submit" className={s.searchFormbutton}>
             <span className={s.searchFormbuttonlabel}>Search</span>
           </button>
 
           <input
-            onChange={this.onInputValue}
-            value={this.state.inputalue}
+            onChange={onInputValue}
+            value={inputalue}
             className={s.searchForminput}
             type="text"
             autoComplete="off"
@@ -39,7 +41,7 @@ class Searchbar extends Component {
         </form>
       </header>
     );
-  }
+  
 }
 Searchbar.propTypes = {
   SubmitForm: PropTypes.func.isRequired,
