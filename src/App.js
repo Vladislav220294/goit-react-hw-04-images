@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import './App.css';
 import Searchbar from './components/Searchbar/Searchbar.jsx';
 import ImageGalleryList from './components/ImageGalleryList/ImageGalleryList.jsx';
@@ -15,6 +15,7 @@ const App = () => {
   const [largeImageURL, setLargeImageURL] = useState('');
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const scrollRef = useRef(null);
 
   useEffect(() => {
     setIsLoading(true);
@@ -35,18 +36,16 @@ const App = () => {
     error && alert('wrong name');
     setIsLoading(false);
   }, [error]);
-  //////////////////////////////////////Доработать скрол
-  // useEffect(() => {
-  //    window.scrollTo({
-  //       top: snapshot,
-  //       behavior: 'smooth',
-  //     });
-  // }, [images])
-  // getSnapshotBeforeUpdate() {
-  //   return document.body.scrollHeight;
-  // }
-  //////////////////////////////////////Доработать скрол
+
+  useEffect(() => {
+    window.scrollTo({
+      top: scrollRef.current,
+      behavior: 'smooth',
+    });
+  }, [images]);
+
   const onLoadMore = () => {
+    scrollRef.current = document.body.scrollHeight;
     if (images) {
       setPage(page => page + 1);
     }
